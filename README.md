@@ -18,18 +18,19 @@ data/team.js        THE TEAM — this is the file you edit or export into
 
 ## What's on the page
 
-* **A card per person.** Click any card to open their detail sheet — role, circle,
-  whether they're in the community, contact (only when there is one to share),
-  superpower, fun fact.
+* **A card per person**, drawn with a hairline and a colour of its own. Click any
+  card to open their detail sheet — role, circle, whether they're in the community,
+  contact (only when there is one to share), superpower, fun fact.
 * **Coaches get gold cards** with a `COACH` ribbon and a gold detail sheet, so
   they stand out from everyone else at a glance.
+* **Four card colours** — blue, red, yellow, green. Set one per person in the
+  admin panel, or leave it on automatic and the page picks a stable colour.
 * **Circles are the four suits** from the org document:
   ♠ Steering · ♥ Membership · ♦ Events & Learning · ♣ Tech, Platform & AI.
   Anyone whose circle isn't decided yet is a **★ Wildcard** — an honest placeholder
   rather than a wrong answer.
 * **Community status** is a coloured dot: active · quieter · not on the platform ·
   to be confirmed. Not everyone is in the community, and the page says so plainly.
-* **Search, filter chips, and a Shuffle button** for re-dealing the deck.
 * Works on phones, keyboard-navigable, and respects reduced-motion settings.
 
 ---
@@ -108,7 +109,7 @@ live at `https://<owner>.github.io/lesko-help-team-page/`.
 
 ## Still to fill in
 
-The page ships with the nine people named so far. Seven of them are Wildcards with
+The page ships with the eleven people named so far. Nine of them are Wildcards with
 no role written yet — those are placeholders waiting for real information, not
 guesses:
 
