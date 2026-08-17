@@ -1,28 +1,36 @@
 # photos
 
-Drop team photos in this folder. The file name must match the person's `id`
-in `data/team.js`, lowercase, with a `.jpg` extension:
+Drop team photos in this folder and commit them. The file name must match the
+person's `id` in `data/team.js`, in lowercase. **The extension doesn't matter** —
+the cards try `.jpg`, `.jpeg`, `.png` and `.webp` in turn, so upload whatever you
+have without renaming it.
 
-```
-photos/matthew.jpg
-photos/giulia.jpg
-photos/amber.jpg
-photos/carter.jpg
-photos/martin.jpg
-photos/megan.jpg
-photos/misty.jpg
-photos/roger.jpg
-photos/rose.jpg
-photos/tony.jpg
-photos/zach.jpg
-```
+A card whose photo isn't here yet shows a monogram instead. Nothing breaks, so
+you can add them one at a time.
 
-The cards already point at these paths. A card whose file isn't here yet shows
-a monogram instead — nothing breaks, so you can add them one at a time.
+## What to name the files from the Drive folder
 
-**Originals:** if you have the untouched originals, put them in
-`photos/originals/` and keep them there. Everything in this folder is a
-processed copy, and originals are what any reprocessing starts from.
+| File in Google Drive | Save it here as |
+| --- | --- |
+| `Matthew.jpeg` | `matthew.jpeg` |
+| `Misty.png` | `misty.png` |
+| `Amber S. Hawkins July 2026.png` | `amber.png` |
+| `Megan.jpg` | `megan.jpg` |
+| `Roger.jpg` | `roger.jpg` |
+| `IMG_0230.jpeg` | `martin.jpeg` |
+| `58842506_880478525637716_1227268994818375680_n.jpeg` | `giulia.jpeg` |
 
-**Format:** square-ish JPEGs, around 800×800, under ~400 KB each. Cards crop
-to a circle, so leave a little room around the head.
+## Still needed
+
+No photo has turned up yet for **Rose**, **Tony**, **Carter** or **Zach**. When
+they do, name them `rose`, `tony`, `carter` and `zach` with any extension.
+
+## Notes
+
+**Originals:** keep the untouched originals in `photos/originals/`. Everything in
+this folder is a processed copy, and originals are what any reprocessing starts
+from.
+
+**Size:** square-ish, around 800×800, under ~400 KB each is ideal. Cards crop to
+a circle, so leave a little room around the head. Larger files work — they just
+make the page slower to load.

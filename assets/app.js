@@ -149,13 +149,34 @@
            esc(initials(p.name)) + "</span></div>";
   }
 
-  /* A photo path that 404s falls back to the monogram, not a broken image
-     icon — this is what lets photos be dropped into photos/ one at a time. */
+  var PHOTO_EXTS = ["jpg", "jpeg", "png", "webp", "JPG", "JPEG", "PNG"];
+
+  /* A photo that fails to load first tries the other common extensions, so a
+     file saved as .png still shows up on a card pointing at .jpg. Only once
+     every extension has failed does the card fall back to the monogram —
+     never a broken-image icon. This is what lets photos be dropped into
+     photos/ one at a time, whatever the camera called them. */
   function wireImageFallbacks(root) {
     var imgs = root.querySelectorAll(".avatar img, .sheet-avatar img");
     Array.prototype.forEach.call(imgs, function (img) {
       img.addEventListener("error", function () {
         var box = img.parentNode;
+        var m = /^(.*\/[^/]+)\.([A-Za-z]+)$/.exec(img.getAttribute("src") || "");
+
+        if (m) {
+          var tried = (box.getAttribute("data-tried") || "").split(",");
+          if (tried[0] === "") tried = [];
+          tried.push(m[2]);
+          box.setAttribute("data-tried", tried.join(","));
+
+          for (var i = 0; i < PHOTO_EXTS.length; i++) {
+            if (tried.indexOf(PHOTO_EXTS[i]) === -1) {
+              img.setAttribute("src", m[1] + "." + PHOTO_EXTS[i]);
+              return;
+            }
+          }
+        }
+
         box.innerHTML = '<span class="mono-initials">' +
           esc(box.getAttribute("data-initials") || "?") + "</span>";
       });
