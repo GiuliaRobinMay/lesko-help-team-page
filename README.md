@@ -99,6 +99,53 @@ list is documented at the top of that file.
 
 ---
 
+## Embedding it in another site (iframe)
+
+The page reports its own height to the page it's embedded in, so the iframe can
+grow with the content instead of scrolling inside a fixed box.
+
+**Simple version** — works anywhere, fixed height:
+
+```html
+<iframe
+  src="https://lesko-help-team-page.netlify.app/"
+  title="The Lesko Help team"
+  loading="lazy"
+  style="width:100%;border:0;height:1600px;display:block;"></iframe>
+```
+
+**Auto-height version** — use this where the host allows a `<script>` tag:
+
+```html
+<iframe
+  id="leskoTeam"
+  src="https://lesko-help-team-page.netlify.app/"
+  title="The Lesko Help team"
+  loading="lazy"
+  style="width:100%;border:0;height:1600px;display:block;"></iframe>
+
+<script>
+  window.addEventListener("message", function (event) {
+    if (event.origin !== "https://lesko-help-team-page.netlify.app") return;
+    if (!event.data || event.data.type !== "lesko-team-height") return;
+    var frame = document.getElementById("leskoTeam");
+    if (frame) frame.style.height = event.data.height + "px";
+  });
+</script>
+```
+
+The origin check matters: without it, any other iframe on the page could resize
+this one.
+
+### Deploying to Netlify
+
+No build command, and the publish directory is the repository root — it's plain
+static files. Point the Netlify site at this repository and make sure the
+**production branch** is the branch you're working on (or merge it into `main`
+first), otherwise the live URL keeps serving the old version.
+
+---
+
 ## Publishing it
 
 Any static host will do. For GitHub Pages: repository **Settings → Pages →

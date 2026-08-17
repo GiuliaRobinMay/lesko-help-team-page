@@ -29,8 +29,8 @@
     <h1>Meet the people<br><em>behind</em> Lesko Help.</h1>
     <p class="hero-copy">
       Everyone who makes this thing run, one card each. Pick a card to see what
-      they do, which circle they sit in, and how to reach them — where there is
-      something to reach. Coaches get the gold treatment.
+      they do and how to reach them — where there is something to reach.
+      Coaches get the gold treatment.
     </p>
   </section>
 
@@ -68,28 +68,24 @@
       </div>
 
       <div class="field">
-        <label class="mono-label" for="f-role">Role — leave empty if undecided</label>
-        <input type="text" id="f-role" name="role" autocomplete="off" placeholder="e.g. Grant Coach">
+        <label class="mono-label" for="f-title">Title — what it says under their name</label>
+        <input type="text" id="f-title" name="title" autocomplete="off" placeholder="e.g. Grant Coach">
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label class="mono-label" for="f-circle">Circle</label>
-          <select id="f-circle" name="circle">
-            <option value="wildcard">★ Wildcard — not assigned yet</option>
-            <option value="steering">♠ Steering</option>
-            <option value="membership">♥ Membership</option>
-            <option value="events">♦ Events &amp; Learning</option>
-            <option value="tech">♣ Tech, Platform &amp; AI</option>
+          <label class="mono-label" for="f-group">Section</label>
+          <select id="f-group" name="group">
+            <option value="coaching">The coaching team</option>
+            <option value="crew">Behind the scenes</option>
           </select>
         </div>
         <div class="field">
-          <label class="mono-label" for="f-status">In the community?</label>
-          <select id="f-status" name="status">
-            <option value="unknown">Not confirmed yet</option>
-            <option value="in-community">Yes — active</option>
-            <option value="quiet">Yes — but quieter</option>
-            <option value="off-platform">No — not on the platform</option>
+          <label class="mono-label" for="f-community">In the community?</label>
+          <select id="f-community" name="community">
+            <option value="">Don&rsquo;t say anything yet</option>
+            <option value="yes">Yes — show the green dot</option>
+            <option value="no">No</option>
           </select>
         </div>
       </div>
@@ -103,6 +99,7 @@
             <option value="red">Red ♥</option>
             <option value="yellow">Yellow ♦</option>
             <option value="green">Green ♣</option>
+            <option value="deepred">Deep red — the host card</option>
           </select>
         </div>
         <div class="field">

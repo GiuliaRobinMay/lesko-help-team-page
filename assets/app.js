@@ -10,33 +10,31 @@
 
   /* ---------------------------------------------------------- constants */
 
-  var STORAGE_KEY = "leskoTeamDeck.v1";
+  var STORAGE_KEY = "leskoTeamDeck.v2";
   var ADMIN_KEY   = "leskoTeamDeck.admin";
   var PASSCODE    = "lesko";          // change me — see README
   var SECRET_TAPS = 5;                // taps on the "?" badge to unlock
   var TAP_WINDOW  = 2500;             // ms
 
-  var CIRCLES = {
-    steering:   { suit: "♠", label: "Steering",            short: "Steering" },
-    membership: { suit: "♥", label: "Membership",          short: "Membership" },
-    events:     { suit: "♦", label: "Events & Learning",   short: "Events" },
-    tech:       { suit: "♣", label: "Tech, Platform & AI", short: "Tech & AI" },
-    wildcard:   { suit: "★", label: "Wildcard",            short: "Wildcard" }
+  var GROUPS = [
+    { key: "coaching", label: "The coaching team" },
+    { key: "crew",     label: "Behind the scenes" }
+  ];
+
+  var TINTS = ["blue", "red", "yellow", "green", "deepred"];
+
+  /* a card's suit follows its colour — decorative, and it keeps the four
+     suits from the brand alive without pretending to mean anything */
+  var SUITS = {
+    blue: "♠", red: "♥", yellow: "♦",
+    green: "♣", deepred: "♥"
   };
+  var COACH_SUIT = "♦";
 
-  var STATUSES = {
-    "in-community": "In the community",
-    "quiet":        "In, but quieter",
-    "off-platform": "Not on the platform",
-    "unknown":      "Status to confirm"
-  };
-
-  var TINTS = ["blue", "red", "yellow", "green"];
-
-  var NO_ROLE_LINES = [
-    "Role still being written",
+  var NO_TITLE_LINES = [
+    "Title still being written",
     "Card in progress",
-    "Role coming soon",
+    "Coming soon",
     "To be dealt"
   ];
 
@@ -78,24 +76,36 @@
     if (p.color && TINTS.indexOf(p.color) !== -1) return p.color;
     var h = 0;
     for (var i = 0; i < p.id.length; i++) { h = (h * 31 + p.id.charCodeAt(i)) >>> 0; }
-    return TINTS[h % TINTS.length];
+    return TINTS[h % 4];               // auto never picks deepred — that's Matthew's
+  }
+
+  function suitOf(p) {
+    return p.coach ? COACH_SUIT : (SUITS[tintOf(p)] || "♠");
+  }
+
+  /* true / false / null — null means "we haven't confirmed yet, say nothing" */
+  function communityOf(p) {
+    if (p.inCommunity === true)  return true;
+    if (p.inCommunity === false) return false;
+    return null;
   }
 
   function normalise(p) {
+    var inC = p.inCommunity;
     return {
-      id:         p.id || uniqueId(slug(p.name), state.people),
-      name:       p.name || "",
-      role:       p.role || "",
-      circle:     CIRCLES[p.circle] ? p.circle : "wildcard",
-      coach:      !!p.coach,
-      status:     STATUSES[p.status] ? p.status : "unknown",
-      color:      TINTS.indexOf(p.color) !== -1 ? p.color : "",
-      photo:      p.photo || "",
-      email:      p.email || "",
-      blurb:      p.blurb || "",
-      superpower: p.superpower || "",
-      funFact:    p.funFact || "",
-      since:      p.since || ""
+      id:          p.id || uniqueId(slug(p.name), state.people),
+      name:        p.name || "",
+      title:       p.title || p.role || "",          // `role` = the old field name
+      group:       p.group === "crew" ? "crew" : "coaching",
+      coach:       !!p.coach,
+      inCommunity: inC === true ? true : (inC === false ? false : null),
+      color:       TINTS.indexOf(p.color) !== -1 ? p.color : "",
+      photo:       p.photo || "",
+      email:       p.email || "",
+      blurb:       p.blurb || "",
+      superpower:  p.superpower || "",
+      funFact:     p.funFact || "",
+      since:       p.since || ""
     };
   }
 
@@ -119,7 +129,7 @@
 
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, people: state.people }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, people: state.people }));
     } catch (e) {
       toast("Could not save locally");
     }
@@ -135,31 +145,20 @@
 
   function isAdmin() { return document.body.classList.contains("admin"); }
 
-  /* ------------------------------------------------------------ ordering */
-
-  function orderedPeople() {
-    return state.people.slice().sort(function (a, b) {
-      if (a.coach !== b.coach) return a.coach ? -1 : 1;          // coaches lead
-      var aw = a.circle === "wildcard", bw = b.circle === "wildcard";
-      if (aw !== bw) return aw ? 1 : -1;                          // then placed people
-      return a.name.localeCompare(b.name);
-    });
-  }
-
   /* -------------------------------------------------------------- render */
 
   function avatarMarkup(p, cls) {
-    var mono = '<span class="mono-initials">' + esc(initials(p.name)) + "</span>";
     if (p.photo) {
-      // if the file is missing the img is swapped for the monogram — see wireImageFallbacks
+      // a missing file is swapped for the monogram — see wireImageFallbacks
       return '<div class="' + cls + '" data-initials="' + esc(initials(p.name)) + '">' +
              '<img src="' + esc(p.photo) + '" alt="' + esc(p.name) + '" loading="lazy"></div>';
     }
-    return '<div class="' + cls + '">' + mono + "</div>";
+    return '<div class="' + cls + '"><span class="mono-initials">' +
+           esc(initials(p.name)) + "</span></div>";
   }
 
-  /* A photo path that 404s should fall back to the monogram, not a broken
-     image icon — this is what lets you drop files into photos/ gradually. */
+  /* A photo path that 404s falls back to the monogram, not a broken image
+     icon — this is what lets photos be dropped into photos/ one at a time. */
   function wireImageFallbacks(root) {
     var imgs = root.querySelectorAll(".avatar img, .sheet-avatar img");
     Array.prototype.forEach.call(imgs, function (img) {
@@ -171,63 +170,93 @@
     });
   }
 
-  function renderDeck() {
-    var list = orderedPeople();
+  function communityMarkup(p) {
+    var inC = communityOf(p);
+    if (inC === null) return "";
+    return '<span class="status"><span class="dot ' + (inC ? "in" : "out") + '"></span>' +
+           (inC ? "In the community" : "Not in the community") + "</span>";
+  }
 
-    el.deck.innerHTML = list.map(function (p, i) {
-      var c = CIRCLES[p.circle];
-      var role = p.role ? { text: p.role, empty: false }
-                        : { text: NO_ROLE_LINES[i % NO_ROLE_LINES.length], empty: true };
+  function cardMarkup(p, i) {
+    var title = p.title
+      ? { text: p.title, empty: false }
+      : { text: NO_TITLE_LINES[i % NO_TITLE_LINES.length], empty: true };
+
+    return (
+      '<button class="card t-' + tintOf(p) + (p.coach ? " is-coach" : "") + '" ' +
+        'data-id="' + esc(p.id) + '" data-suit="' + suitOf(p) + '" ' +
+        'style="animation-delay:' + Math.min(i * 45, 600) + 'ms" ' +
+        'aria-label="Open ' + esc(p.name) + '">' +
+        (p.coach ? '<div class="coach-ribbon">COACH</div>' : "") +
+        '<div class="card-corner"><b>' + esc(initials(p.name).charAt(0)) + "</b>" +
+          "<span>" + suitOf(p) + "</span></div>" +
+        '<div class="admin-tools">' +
+          '<span class="icon-btn" data-move-up="' + esc(p.id) + '" role="button" title="Move earlier" tabindex="0">↑</span>' +
+          '<span class="icon-btn" data-move-down="' + esc(p.id) + '" role="button" title="Move later" tabindex="0">↓</span>' +
+          '<span class="icon-btn" data-edit="' + esc(p.id) + '" role="button" title="Edit" tabindex="0">✎</span>' +
+          '<span class="icon-btn del" data-del="' + esc(p.id) + '" role="button" title="Delete" tabindex="0">✕</span>' +
+        "</div>" +
+        avatarMarkup(p, "avatar") +
+        '<h3 class="card-name">' + esc(p.name) + "</h3>" +
+        '<p class="card-role' + (title.empty ? " empty" : "") + '">' + esc(title.text) + "</p>" +
+        '<div class="card-foot">' + communityMarkup(p) + "</div>" +
+      "</button>"
+    );
+  }
+
+  function renderDeck() {
+    var n = 0;
+    el.deck.innerHTML = GROUPS.map(function (g) {
+      var members = state.people.filter(function (p) { return p.group === g.key; });
+      if (!members.length) return "";
       return (
-        '<button class="card t-' + tintOf(p) + (p.coach ? " is-coach" : "") + '" ' +
-          'data-id="' + esc(p.id) + '" data-suit="' + c.suit + '" ' +
-          'style="animation-delay:' + Math.min(i * 45, 700) + 'ms" ' +
-          'aria-label="Open ' + esc(p.name) + '">' +
-          (p.coach ? '<div class="coach-ribbon">COACH</div>' : "") +
-          '<div class="card-corner"><b>' + esc(initials(p.name).charAt(0)) + "</b>" +
-            "<span>" + c.suit + "</span></div>" +
-          '<div class="admin-tools">' +
-            '<span class="icon-btn edit" data-edit="' + esc(p.id) + '" role="button" title="Edit" tabindex="0">✎</span>' +
-            '<span class="icon-btn del" data-del="' + esc(p.id) + '" role="button" title="Delete" tabindex="0">✕</span>' +
+        '<section class="deck-section">' +
+          '<div class="section-head"><h2>' + esc(g.label) + "</h2>" +
+            '<span class="count">' + members.length +
+              (members.length === 1 ? " person" : " people") + "</span></div>" +
+          '<div class="section-grid">' +
+            members.map(function (p) { return cardMarkup(p, n++); }).join("") +
           "</div>" +
-          avatarMarkup(p, "avatar") +
-          '<h2 class="card-name">' + esc(p.name) + "</h2>" +
-          '<p class="card-role' + (role.empty ? " empty" : "") + '">' + esc(role.text) + "</p>" +
-          '<div class="card-foot">' +
-            '<span class="circle-tag">' + esc(c.short) + "</span>" +
-            '<span class="status"><span class="dot ' + p.status + '"></span>' +
-              esc(shortStatus(p.status)) + "</span>" +
-          "</div>" +
-        "</button>"
+        "</section>"
       );
     }).join("");
 
     wireImageFallbacks(el.deck);
   }
 
-  function shortStatus(s) {
-    return {
-      "in-community": "Active",
-      "quiet": "Quieter",
-      "off-platform": "Off-platform",
-      "unknown": "TBC"
-    }[s] || "TBC";
+  function render() {
+    renderDeck();
+    reportHeight();
   }
 
-  function render() { renderDeck(); }
+  /* ------------------------------------------------------- iframe embeds */
+
+  /* When this page is embedded, tell the host page how tall it is so the
+     iframe can grow instead of scrolling inside itself. Harmless when the
+     page is opened directly. See the embed snippet in the README. */
+  var lastHeight = 0;
+  function reportHeight() {
+    if (window.parent === window) return;
+    var h = Math.ceil(document.documentElement.scrollHeight);
+    if (h === lastHeight) return;
+    lastHeight = h;
+    try {
+      window.parent.postMessage({ type: "lesko-team-height", height: h }, "*");
+    } catch (e) { /* cross-origin host that won't listen — nothing to do */ }
+  }
 
   /* --------------------------------------------------------- person view */
 
   function openPerson(id) {
     var p = state.people.filter(function (x) { return x.id === id; })[0];
     if (!p) return;
-    var c = CIRCLES[p.circle];
-    var role = p.role ? { text: p.role, empty: false }
-                      : { text: "Role not decided yet", empty: true };
+    var group = GROUPS.filter(function (g) { return g.key === p.group; })[0] || GROUPS[0];
+    var title = p.title
+      ? { text: p.title, empty: false }
+      : { text: "Title not decided yet", empty: true };
+    var inC = communityOf(p);
 
     var facts = "";
-    facts += fact("Circle", c.suit + " " + esc(c.label));
-    facts += fact("In the community", esc(STATUSES[p.status]));
     if (p.superpower) facts += fact("Superpower", esc(p.superpower));
     if (p.since)      facts += fact("With us since", esc(p.since));
     if (p.funFact)    facts += fact("Fun fact", esc(p.funFact));
@@ -236,15 +265,17 @@
       : '<span style="color:var(--ink-faint)">Nothing public to share</span>');
 
     el.personContent.innerHTML =
-      '<div class="sheet-head t-' + tintOf(p) + (p.coach ? " is-coach" : "") + '" data-suit="' + c.suit + '">' +
+      '<div class="sheet-head t-' + tintOf(p) + (p.coach ? " is-coach" : "") +
+          '" data-suit="' + suitOf(p) + '">' +
         avatarMarkup(p, "sheet-avatar") +
         '<div class="sheet-id">' +
           '<h2 id="sheetName">' + esc(p.name) + "</h2>" +
-          '<p class="role' + (role.empty ? " empty" : "") + '">' + esc(role.text) + "</p>" +
+          '<p class="role' + (title.empty ? " empty" : "") + '">' + esc(title.text) + "</p>" +
           '<div class="sheet-badges">' +
-            (p.coach ? '<span class="badge gold">♛ Team coach</span>' : "") +
-            '<span class="badge">' + c.suit + " " + esc(c.label) + "</span>" +
-            '<span class="badge"><span class="dot ' + p.status + '"></span>' + esc(STATUSES[p.status]) + "</span>" +
+            '<span class="badge">' + esc(group.label) + "</span>" +
+            (inC === null ? ""
+              : '<span class="badge"><span class="dot ' + (inC ? "in" : "out") + '"></span>' +
+                (inC ? "In the community" : "Not in the community") + "</span>") +
           "</div>" +
         "</div>" +
       "</div>" +
@@ -252,10 +283,6 @@
         '<p class="blurb' + (p.blurb ? "" : " empty") + '">' +
           esc(p.blurb || "No intro written yet — this card is waiting for its story.") + "</p>" +
         '<div class="facts">' + facts + "</div>" +
-        (p.circle === "wildcard"
-          ? '<p class="note">Circle not assigned yet. It gets decided in the first circle meetings, ' +
-            "then this card updates.</p>"
-          : "") +
         (isAdmin()
           ? '<div class="editor-actions"><button class="btn" data-edit="' + esc(p.id) + '">Edit this card</button></div>'
           : "") +
@@ -305,11 +332,12 @@
     var p = id ? state.people.filter(function (x) { return x.id === id; })[0] : null;
 
     $("editorTitle").textContent = p ? "Edit " + p.name : "Add a card";
-    $("f-id").value         = p ? p.id : "";
-    $("f-name").value       = p ? p.name : "";
-    $("f-role").value       = p ? p.role : "";
-    $("f-circle").value     = p ? p.circle : "wildcard";
-    $("f-status").value     = p ? p.status : "unknown";
+    $("f-id").value        = p ? p.id : "";
+    $("f-name").value      = p ? p.name : "";
+    $("f-title").value     = p ? p.title : "";
+    $("f-group").value     = p ? p.group : "coaching";
+    $("f-community").value = p ? (p.inCommunity === true ? "yes"
+                                : p.inCommunity === false ? "no" : "") : "";
     $("f-color").value      = p ? p.color : "";
     $("f-coach").checked    = p ? p.coach : false;
     $("f-photo").value      = p ? p.photo : "";
@@ -337,20 +365,21 @@
   function submitEditor(e) {
     e.preventDefault();
     var id = $("f-id").value;
+    var comm = $("f-community").value;
     var data = {
       id: id,
-      name:       $("f-name").value.trim(),
-      role:       $("f-role").value.trim(),
-      circle:     $("f-circle").value,
-      status:     $("f-status").value,
-      color:      $("f-color").value,
-      coach:      $("f-coach").checked,
-      photo:      $("f-photo").value.trim(),
-      email:      $("f-email").value.trim(),
-      blurb:      $("f-blurb").value.trim(),
-      superpower: $("f-superpower").value.trim(),
-      since:      $("f-since").value.trim(),
-      funFact:    $("f-funfact").value.trim()
+      name:        $("f-name").value.trim(),
+      title:       $("f-title").value.trim(),
+      group:       $("f-group").value,
+      inCommunity: comm === "yes" ? true : (comm === "no" ? false : null),
+      color:       $("f-color").value,
+      coach:       $("f-coach").checked,
+      photo:       $("f-photo").value.trim(),
+      email:       $("f-email").value.trim(),
+      blurb:       $("f-blurb").value.trim(),
+      superpower:  $("f-superpower").value.trim(),
+      since:       $("f-since").value.trim(),
+      funFact:     $("f-funfact").value.trim()
     };
     if (!data.name) { toast("A card needs a name"); return; }
 
@@ -380,10 +409,28 @@
     toast(p.name + " removed");
   }
 
+  /* Move a person one place earlier or later within their own section. */
+  function movePerson(id, delta) {
+    var idx = state.people.findIndex(function (p) { return p.id === id; });
+    if (idx === -1) return;
+    var person = state.people[idx];
+
+    var siblings = state.people.filter(function (p) { return p.group === person.group; });
+    var pos = siblings.indexOf(person);
+    var target = siblings[pos + delta];
+    if (!target) { toast("Already at the " + (delta < 0 ? "start" : "end")); return; }
+
+    var targetIdx = state.people.indexOf(target);
+    state.people[idx] = target;
+    state.people[targetIdx] = person;
+    save();
+    render();
+  }
+
   /* -------------------------------------------------------------- export */
 
   function exportSource() {
-    var body = JSON.stringify({ version: 1, updated: today(), people: state.people }, null, 2);
+    var body = JSON.stringify({ version: 2, updated: today(), people: state.people }, null, 2);
     return "/* Lesko Help — the team deck. Exported from the admin panel. */\n\n" +
            "window.LESKO_TEAM_SEED = " + body + ";\n";
   }
@@ -410,21 +457,15 @@
     taps++;
     clearTimeout(tapTimer);
     tapTimer = setTimeout(function () { taps = 0; }, TAP_WINDOW);
-    if (taps >= SECRET_TAPS) {
-      taps = 0;
-      askForPasscode();
-    }
+    if (taps >= SECRET_TAPS) { taps = 0; askForPasscode(); }
   }
 
   function askForPasscode() {
     if (isAdmin()) { toast("Already in admin mode"); return; }
     var input = prompt("Admin passcode");
     if (input === null) return;
-    if (input.trim().toLowerCase() === PASSCODE) {
-      enterAdmin();
-    } else {
-      toast("Nope — try again");
-    }
+    if (input.trim().toLowerCase() === PASSCODE) enterAdmin();
+    else toast("Nope — try again");
   }
 
   function enterAdmin() {
@@ -444,8 +485,11 @@
   /* --------------------------------------------------------------- events */
 
   function bind() {
-    // deck: open a person, or use the admin tools on the card
     el.deck.addEventListener("click", function (e) {
+      var up = e.target.closest("[data-move-up]");
+      if (up) { e.stopPropagation(); movePerson(up.getAttribute("data-move-up"), -1); return; }
+      var down = e.target.closest("[data-move-down]");
+      if (down) { e.stopPropagation(); movePerson(down.getAttribute("data-move-down"), 1); return; }
       var del = e.target.closest("[data-del]");
       if (del) { e.stopPropagation(); deletePerson(del.getAttribute("data-del")); return; }
       var edit = e.target.closest("[data-edit]");
@@ -459,7 +503,6 @@
       if (edit) openEditor(edit.getAttribute("data-edit"));
     });
 
-    // overlays
     $("personClose").addEventListener("click", function () { hide(el.personOverlay); });
     $("editorClose").addEventListener("click", function () { hide(el.editorOverlay); });
     $("editorCancel").addEventListener("click", function () { hide(el.editorOverlay); });
@@ -474,14 +517,12 @@
         var open = document.querySelector(".overlay:not([hidden])");
         if (open) hide(open);
       }
-      // hidden admin shortcut
       if (e.key && e.key.toLowerCase() === "a" && e.ctrlKey && e.shiftKey) {
         e.preventDefault();
         isAdmin() ? exitAdmin() : askForPasscode();
       }
     });
 
-    // editor
     el.editorForm.addEventListener("submit", submitEditor);
     $("editorDelete").addEventListener("click", function () { deletePerson($("f-id").value); });
     $("f-photo").addEventListener("input", updatePhotoPreview);
@@ -493,9 +534,7 @@
     $("f-upload").addEventListener("change", function (e) {
       var file = e.target.files && e.target.files[0];
       if (!file) return;
-      if (file.size > 900 * 1024) {
-        toast("That image is large — try one under 900 KB");
-      }
+      if (file.size > 900 * 1024) toast("That image is large — try one under 900 KB");
       var reader = new FileReader();
       reader.onload = function () {
         $("f-photo").value = reader.result;
@@ -504,7 +543,6 @@
       reader.readAsDataURL(file);
     });
 
-    // admin bar
     $("addPerson").addEventListener("click", function () { openEditor(null); });
     $("exportBtn").addEventListener("click", openExport);
     $("exitAdmin").addEventListener("click", exitAdmin);
@@ -516,7 +554,6 @@
       toast("Back to the saved deck");
     });
 
-    // export helpers
     $("copyExport").addEventListener("click", function () {
       el.exportBox.select();
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -543,7 +580,6 @@
       toast("Downloaded team.js");
     });
 
-    // the hidden way in
     $("secretMark").addEventListener("click", secretTap);
     $("secretFoot").addEventListener("click", secretTap);
   }
@@ -569,6 +605,10 @@
 
     bind();
     render();
+
+    window.addEventListener("resize", reportHeight);
+    window.addEventListener("load", reportHeight);
+    setInterval(reportHeight, 1000);   // catches photos finishing their load
   }
 
   if (document.readyState === "loading") {
