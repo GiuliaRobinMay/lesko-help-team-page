@@ -12,12 +12,10 @@
    id        unique slug, lowercase, no spaces (used internally)
    name      display name
    title     what it says under their name. Leave "" if undecided.
-   group     "coaching" = The coaching team · "crew" = Behind the scenes
-   coach     true gives the gold coach card
    inCommunity  true  = green dot, "In the community"
                 false = hollow dot, "Not in the community"
                 null  = say nothing yet
-   color     "red" | "deepred" | "blue" | "yellow" | "green"
+   color     "blue" | "red" | "yellow" | "green" | "deepred"
              Leave "" to have one picked automatically.
    photo     path or URL. Cards point at photos/<id>.jpg — drop a file with
              that exact name into photos/ and it appears. Until then the
@@ -30,16 +28,13 @@
    ------------------------------------------------------------------ */
 
 window.LESKO_TEAM_SEED = {
-  version: 2,
+  version: 3,
   updated: "2026-08-17",
   people: [
-    /* ---------------------------------------------- The coaching team */
     {
       id: "matthew",
       name: "Matthew",
       title: "Your host & grant expert",
-      group: "coaching",
-      coach: false,
       inCommunity: true,
       color: "deepred",
       photo: "photos/matthew.jpg",
@@ -54,10 +49,8 @@ window.LESKO_TEAM_SEED = {
       id: "misty",
       name: "Misty",
       title: "Grant Coach",
-      group: "coaching",
-      coach: true,
       inCommunity: null,
-      color: "",
+      color: "blue",
       photo: "photos/misty.jpg",
       email: "",
       blurb: "",
@@ -69,10 +62,8 @@ window.LESKO_TEAM_SEED = {
       id: "amber",
       name: "Amber",
       title: "Grant Coach",
-      group: "coaching",
-      coach: true,
       inCommunity: null,
-      color: "",
+      color: "red",
       photo: "photos/amber.jpg",
       email: "",
       blurb: "",
@@ -84,10 +75,8 @@ window.LESKO_TEAM_SEED = {
       id: "rose",
       name: "Rose",
       title: "Grant Coach",
-      group: "coaching",
-      coach: true,
       inCommunity: null,
-      color: "",
+      color: "yellow",
       photo: "photos/rose.jpg",
       email: "",
       blurb: "",
@@ -99,10 +88,8 @@ window.LESKO_TEAM_SEED = {
       id: "tony",
       name: "Tony",
       title: "Grant Coach",
-      group: "coaching",
-      coach: true,
       inCommunity: null,
-      color: "",
+      color: "green",
       photo: "photos/tony.jpg",
       email: "",
       blurb: "",
@@ -114,10 +101,8 @@ window.LESKO_TEAM_SEED = {
       id: "roger",
       name: "Roger",
       title: "Grant Coach",
-      group: "coaching",
-      coach: true,
       inCommunity: null,
-      color: "",
+      color: "red",
       photo: "photos/roger.jpg",
       email: "",
       blurb: "",
@@ -129,10 +114,8 @@ window.LESKO_TEAM_SEED = {
       id: "megan",
       name: "Megan",
       title: "Grant Coach",
-      group: "coaching",
-      coach: true,
       inCommunity: null,
-      color: "",
+      color: "yellow",
       photo: "photos/megan.jpg",
       email: "",
       blurb: "",
@@ -140,14 +123,10 @@ window.LESKO_TEAM_SEED = {
       funFact: "",
       since: ""
     },
-
-    /* --------------------------------------------- Behind the scenes */
     {
       id: "giulia",
       name: "Giulia",
       title: "Community Admin & Strategist",
-      group: "crew",
-      coach: false,
       inCommunity: true,
       color: "blue",
       photo: "photos/giulia.jpg",
@@ -162,8 +141,6 @@ window.LESKO_TEAM_SEED = {
       id: "carter",
       name: "Carter",
       title: "Marketing",
-      group: "crew",
-      coach: false,
       inCommunity: null,
       color: "yellow",
       photo: "photos/carter.jpg",
@@ -177,8 +154,6 @@ window.LESKO_TEAM_SEED = {
       id: "martin",
       name: "Martin",
       title: "Tech",
-      group: "crew",
-      coach: false,
       inCommunity: null,
       color: "green",
       photo: "photos/martin.jpg",
@@ -192,8 +167,6 @@ window.LESKO_TEAM_SEED = {
       id: "zach",
       name: "Zach",
       title: "Social Media",
-      group: "crew",
-      coach: false,
       inCommunity: null,
       color: "red",
       photo: "photos/zach.jpg",

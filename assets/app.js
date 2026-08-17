@@ -10,16 +10,11 @@
 
   /* ---------------------------------------------------------- constants */
 
-  var STORAGE_KEY = "leskoTeamDeck.v2";
+  var STORAGE_KEY = "leskoTeamDeck.v3";
   var ADMIN_KEY   = "leskoTeamDeck.admin";
   var PASSCODE    = "lesko";          // change me — see README
   var SECRET_TAPS = 5;                // taps on the "?" badge to unlock
   var TAP_WINDOW  = 2500;             // ms
-
-  var GROUPS = [
-    { key: "coaching", label: "The coaching team" },
-    { key: "crew",     label: "Behind the scenes" }
-  ];
 
   var TINTS = ["blue", "red", "yellow", "green", "deepred"];
 
@@ -29,7 +24,6 @@
     blue: "♠", red: "♥", yellow: "♦",
     green: "♣", deepred: "♥"
   };
-  var COACH_SUIT = "♦";
 
   var NO_TITLE_LINES = [
     "Title still being written",
@@ -80,7 +74,7 @@
   }
 
   function suitOf(p) {
-    return p.coach ? COACH_SUIT : (SUITS[tintOf(p)] || "♠");
+    return SUITS[tintOf(p)] || "♠";
   }
 
   /* true / false / null — null means "we haven't confirmed yet, say nothing" */
@@ -96,8 +90,6 @@
       id:          p.id || uniqueId(slug(p.name), state.people),
       name:        p.name || "",
       title:       p.title || p.role || "",          // `role` = the old field name
-      group:       p.group === "crew" ? "crew" : "coaching",
-      coach:       !!p.coach,
       inCommunity: inC === true ? true : (inC === false ? false : null),
       color:       TINTS.indexOf(p.color) !== -1 ? p.color : "",
       photo:       p.photo || "",
@@ -129,7 +121,7 @@
 
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, people: state.people }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 3, people: state.people }));
     } catch (e) {
       toast("Could not save locally");
     }
@@ -183,11 +175,10 @@
       : { text: NO_TITLE_LINES[i % NO_TITLE_LINES.length], empty: true };
 
     return (
-      '<button class="card t-' + tintOf(p) + (p.coach ? " is-coach" : "") + '" ' +
+      '<button class="card t-' + tintOf(p) + '" ' +
         'data-id="' + esc(p.id) + '" data-suit="' + suitOf(p) + '" ' +
         'style="animation-delay:' + Math.min(i * 45, 600) + 'ms" ' +
         'aria-label="Open ' + esc(p.name) + '">' +
-        (p.coach ? '<div class="coach-ribbon">COACH</div>' : "") +
         '<div class="card-corner"><b>' + esc(initials(p.name).charAt(0)) + "</b>" +
           "<span>" + suitOf(p) + "</span></div>" +
         '<div class="admin-tools">' +
@@ -205,22 +196,7 @@
   }
 
   function renderDeck() {
-    var n = 0;
-    el.deck.innerHTML = GROUPS.map(function (g) {
-      var members = state.people.filter(function (p) { return p.group === g.key; });
-      if (!members.length) return "";
-      return (
-        '<section class="deck-section">' +
-          '<div class="section-head"><h2>' + esc(g.label) + "</h2>" +
-            '<span class="count">' + members.length +
-              (members.length === 1 ? " person" : " people") + "</span></div>" +
-          '<div class="section-grid">' +
-            members.map(function (p) { return cardMarkup(p, n++); }).join("") +
-          "</div>" +
-        "</section>"
-      );
-    }).join("");
-
+    el.deck.innerHTML = state.people.map(cardMarkup).join("");
     wireImageFallbacks(el.deck);
   }
 
@@ -250,7 +226,6 @@
   function openPerson(id) {
     var p = state.people.filter(function (x) { return x.id === id; })[0];
     if (!p) return;
-    var group = GROUPS.filter(function (g) { return g.key === p.group; })[0] || GROUPS[0];
     var title = p.title
       ? { text: p.title, empty: false }
       : { text: "Title not decided yet", empty: true };
@@ -265,18 +240,15 @@
       : '<span style="color:var(--ink-faint)">Nothing public to share</span>');
 
     el.personContent.innerHTML =
-      '<div class="sheet-head t-' + tintOf(p) + (p.coach ? " is-coach" : "") +
-          '" data-suit="' + suitOf(p) + '">' +
+      '<div class="sheet-head t-' + tintOf(p) + '" data-suit="' + suitOf(p) + '">' +
         avatarMarkup(p, "sheet-avatar") +
         '<div class="sheet-id">' +
           '<h2 id="sheetName">' + esc(p.name) + "</h2>" +
           '<p class="role' + (title.empty ? " empty" : "") + '">' + esc(title.text) + "</p>" +
-          '<div class="sheet-badges">' +
-            '<span class="badge">' + esc(group.label) + "</span>" +
-            (inC === null ? ""
-              : '<span class="badge"><span class="dot ' + (inC ? "in" : "out") + '"></span>' +
-                (inC ? "In the community" : "Not in the community") + "</span>") +
-          "</div>" +
+          (inC === null ? "" :
+            '<div class="sheet-badges"><span class="badge"><span class="dot ' +
+            (inC ? "in" : "out") + '"></span>' +
+            (inC ? "In the community" : "Not in the community") + "</span></div>") +
         "</div>" +
       "</div>" +
       '<div class="sheet-body">' +
@@ -335,11 +307,9 @@
     $("f-id").value        = p ? p.id : "";
     $("f-name").value      = p ? p.name : "";
     $("f-title").value     = p ? p.title : "";
-    $("f-group").value     = p ? p.group : "coaching";
     $("f-community").value = p ? (p.inCommunity === true ? "yes"
                                 : p.inCommunity === false ? "no" : "") : "";
     $("f-color").value      = p ? p.color : "";
-    $("f-coach").checked    = p ? p.coach : false;
     $("f-photo").value      = p ? p.photo : "";
     $("f-email").value      = p ? p.email : "";
     $("f-blurb").value      = p ? p.blurb : "";
@@ -370,10 +340,8 @@
       id: id,
       name:        $("f-name").value.trim(),
       title:       $("f-title").value.trim(),
-      group:       $("f-group").value,
       inCommunity: comm === "yes" ? true : (comm === "no" ? false : null),
       color:       $("f-color").value,
-      coach:       $("f-coach").checked,
       photo:       $("f-photo").value.trim(),
       email:       $("f-email").value.trim(),
       blurb:       $("f-blurb").value.trim(),
@@ -409,20 +377,18 @@
     toast(p.name + " removed");
   }
 
-  /* Move a person one place earlier or later within their own section. */
+  /* Move a person one place earlier or later in the deck. */
   function movePerson(id, delta) {
     var idx = state.people.findIndex(function (p) { return p.id === id; });
     if (idx === -1) return;
-    var person = state.people[idx];
-
-    var siblings = state.people.filter(function (p) { return p.group === person.group; });
-    var pos = siblings.indexOf(person);
-    var target = siblings[pos + delta];
-    if (!target) { toast("Already at the " + (delta < 0 ? "start" : "end")); return; }
-
-    var targetIdx = state.people.indexOf(target);
-    state.people[idx] = target;
-    state.people[targetIdx] = person;
+    var to = idx + delta;
+    if (to < 0 || to >= state.people.length) {
+      toast("Already at the " + (delta < 0 ? "start" : "end"));
+      return;
+    }
+    var moved = state.people[idx];
+    state.people[idx] = state.people[to];
+    state.people[to] = moved;
     save();
     render();
   }
@@ -430,7 +396,7 @@
   /* -------------------------------------------------------------- export */
 
   function exportSource() {
-    var body = JSON.stringify({ version: 2, updated: today(), people: state.people }, null, 2);
+    var body = JSON.stringify({ version: 3, updated: today(), people: state.people }, null, 2);
     return "/* Lesko Help — the team deck. Exported from the admin panel. */\n\n" +
            "window.LESKO_TEAM_SEED = " + body + ";\n";
   }

@@ -134,37 +134,11 @@ h1 em { color: var(--red); font-style: italic; }
 
 /* ---------------------------------------------------------------- grid */
 
-.deck { padding: 36px 0 10px; }
-
-.deck-section + .deck-section { margin-top: 44px; }
-
-.section-head {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--hairline);
-  margin-bottom: 24px;
-}
-.section-head h2 {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-style: italic;
-  font-size: 26px;
-  margin: 0;
-}
-.section-head .count {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.section-grid {
+.deck {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(218px, 1fr));
   gap: 20px;
+  padding: 44px 0 10px;
 }
 
 .card {
@@ -231,14 +205,6 @@ h1 em { color: var(--red); font-style: italic; }
 .card.t-deepred .status { color: rgba(255,238,235,.82); }
 .card.t-deepred .avatar { background: #fff8f6; border-color: rgba(255,220,215,.5); }
 .card.t-deepred .dot    { border-color: rgba(255,225,220,.7); }
-
-/* coach cards get the gold treatment */
-.card.is-coach {
-  --card-bg: linear-gradient(155deg, #fdf3d6 0%, #f9e3a6 60%, #f2d183 100%);
-  --card-line: rgba(170, 120, 20, .45);
-  --card-accent: #96660a;
-  box-shadow: 0 1px 2px rgba(122,82,5,.08), 0 12px 26px -18px rgba(122,82,5,.5);
-}
 
 .avatar {
   width: 104px; height: 104px;
@@ -313,18 +279,6 @@ h1 em { color: var(--red); font-style: italic; }
 .dot.in  { background: var(--green); }
 .dot.out { background: transparent; }
 
-.coach-ribbon {
-  position: absolute;
-  top: 13px; right: -32px;
-  transform: rotate(38deg);
-  background: var(--ink);
-  color: #f7d774;
-  font-family: var(--mono);
-  font-size: 8.5px;
-  letter-spacing: .14em;
-  padding: 4px 34px;
-  z-index: 2;
-}
 
 .admin-tools {
   position: absolute;
@@ -334,7 +288,6 @@ h1 em { color: var(--red); font-style: italic; }
   z-index: 5;
 }
 body.admin .card .admin-tools { display: flex; }
-body.admin .card.is-coach .coach-ribbon { display: none; }
 
 .icon-btn {
   width: 26px; height: 26px;
@@ -475,11 +428,6 @@ body.admin .card.is-coach .coach-ribbon { display: none; }
   color: #fff5f3;
 }
 .sheet-head.t-deepred .sheet-avatar { background: #fff8f6; border-color: rgba(255,220,215,.5); }
-.sheet-head.is-coach {
-  --card-bg: linear-gradient(155deg, #fdf3d6 0%, #f9e3a6 60%, #f2d183 100%);
-  --card-line: rgba(170,120,20,.45);
-  --card-accent: #96660a;
-}
 
 .sheet-avatar {
   width: 112px; height: 112px;
@@ -514,7 +462,6 @@ body.admin .card.is-coach .coach-ribbon { display: none; }
   background: rgba(255,253,247,.7);
   display: inline-flex; align-items: center; gap: 5px;
 }
-.badge.gold { background: rgba(255,253,247,.85); }
 
 .sheet-body { padding: 24px 26px 26px; }
 .sheet-body .blurb { font-family: var(--serif); font-size: 18px; line-height: 1.5; margin: 0 0 20px; }
@@ -651,9 +598,7 @@ form.editor .hint { color: var(--ink-soft); font-size: 13px; margin: 0 0 20px; }
 
 @media (max-width: 720px) {
   .hero { padding: 28px 0 4px; }
-  .deck { padding-top: 26px; }
-  .section-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 14px; }
-  .section-head h2 { font-size: 22px; }
+  .deck { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 14px; padding-top: 30px; }
   .card { padding: 16px 12px 12px; }
   .avatar { width: 78px; height: 78px; }
   .avatar .mono-initials { font-size: 28px; }

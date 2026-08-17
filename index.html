@@ -30,7 +30,6 @@
     <p class="hero-copy">
       Everyone who makes this thing run, one card each. Pick a card to see what
       they do and how to reach them — where there is something to reach.
-      Coaches get the gold treatment.
     </p>
   </section>
 
@@ -74,13 +73,6 @@
 
       <div class="field-row">
         <div class="field">
-          <label class="mono-label" for="f-group">Section</label>
-          <select id="f-group" name="group">
-            <option value="coaching">The coaching team</option>
-            <option value="crew">Behind the scenes</option>
-          </select>
-        </div>
-        <div class="field">
           <label class="mono-label" for="f-community">In the community?</label>
           <select id="f-community" name="community">
             <option value="">Don&rsquo;t say anything yet</option>
@@ -88,9 +80,6 @@
             <option value="no">No</option>
           </select>
         </div>
-      </div>
-
-      <div class="field-row">
         <div class="field">
           <label class="mono-label" for="f-color">Card colour</label>
           <select id="f-color" name="color">
@@ -102,17 +91,6 @@
             <option value="deepred">Deep red — the host card</option>
           </select>
         </div>
-        <div class="field">
-          <label class="mono-label" for="f-since">With us since</label>
-          <input type="text" id="f-since" name="since" autocomplete="off" placeholder="e.g. 2023">
-        </div>
-      </div>
-
-      <div class="field">
-        <label class="check">
-          <input type="checkbox" id="f-coach" name="coach">
-          <span>Team coach &mdash; gives this card the gold look ♛</span>
-        </label>
       </div>
 
       <div class="field">
@@ -148,9 +126,14 @@
           <input type="text" id="f-superpower" name="superpower" autocomplete="off" placeholder="Something playful">
         </div>
         <div class="field">
-          <label class="mono-label" for="f-funfact">Fun fact</label>
-          <input type="text" id="f-funfact" name="funFact" autocomplete="off">
+          <label class="mono-label" for="f-since">With us since</label>
+          <input type="text" id="f-since" name="since" autocomplete="off" placeholder="e.g. 2023">
         </div>
+      </div>
+
+      <div class="field">
+        <label class="mono-label" for="f-funfact">Fun fact</label>
+        <input type="text" id="f-funfact" name="funFact" autocomplete="off">
       </div>
 
       <input type="hidden" id="f-id" name="id">
