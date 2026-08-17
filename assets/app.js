@@ -31,6 +31,8 @@
     "unknown":      "Status to confirm"
   };
 
+  var TINTS = ["blue", "red", "yellow", "green"];
+
   var NO_ROLE_LINES = [
     "Role still being written",
     "Card in progress",
@@ -40,13 +42,7 @@
 
   /* -------------------------------------------------------------- state */
 
-  var state = {
-    people: [],
-    filter: "all",      // "all" | circle key | "coach"
-    query: "",
-    order: null         // array of ids when shuffled
-  };
-
+  var state = { people: [] };
   var el = {};
 
   /* ------------------------------------------------------------ helpers */
@@ -76,6 +72,15 @@
     return id;
   }
 
+  /* A card's colour: whatever admin picked, otherwise one derived from the
+     person's id — so it stays theirs even as other cards come and go. */
+  function tintOf(p) {
+    if (p.color && TINTS.indexOf(p.color) !== -1) return p.color;
+    var h = 0;
+    for (var i = 0; i < p.id.length; i++) { h = (h * 31 + p.id.charCodeAt(i)) >>> 0; }
+    return TINTS[h % TINTS.length];
+  }
+
   function normalise(p) {
     return {
       id:         p.id || uniqueId(slug(p.name), state.people),
@@ -84,6 +89,7 @@
       circle:     CIRCLES[p.circle] ? p.circle : "wildcard",
       coach:      !!p.coach,
       status:     STATUSES[p.status] ? p.status : "unknown",
+      color:      TINTS.indexOf(p.color) !== -1 ? p.color : "",
       photo:      p.photo || "",
       email:      p.email || "",
       blurb:      p.blurb || "",
@@ -131,104 +137,49 @@
 
   /* ------------------------------------------------------------ ordering */
 
-  function visiblePeople() {
-    var q = state.query.trim().toLowerCase();
-    var list = state.people.filter(function (p) {
-      if (state.filter === "coach" && !p.coach) return false;
-      if (state.filter !== "all" && state.filter !== "coach" && p.circle !== state.filter) return false;
-      if (!q) return true;
-      return (p.name + " " + p.role + " " + p.blurb + " " + p.superpower)
-        .toLowerCase().indexOf(q) !== -1;
+  function orderedPeople() {
+    return state.people.slice().sort(function (a, b) {
+      if (a.coach !== b.coach) return a.coach ? -1 : 1;          // coaches lead
+      var aw = a.circle === "wildcard", bw = b.circle === "wildcard";
+      if (aw !== bw) return aw ? 1 : -1;                          // then placed people
+      return a.name.localeCompare(b.name);
     });
-
-    if (state.order) {
-      var pos = {};
-      state.order.forEach(function (id, i) { pos[id] = i; });
-      list.sort(function (a, b) {
-        return (pos[a.id] == null ? 999 : pos[a.id]) - (pos[b.id] == null ? 999 : pos[b.id]);
-      });
-    } else {
-      // coaches first, then people with a circle, then wildcards
-      list.sort(function (a, b) {
-        if (a.coach !== b.coach) return a.coach ? -1 : 1;
-        var aw = a.circle === "wildcard", bw = b.circle === "wildcard";
-        if (aw !== bw) return aw ? 1 : -1;
-        return a.name.localeCompare(b.name);
-      });
-    }
-    return list;
   }
 
   /* -------------------------------------------------------------- render */
 
   function avatarMarkup(p, cls) {
+    var mono = '<span class="mono-initials">' + esc(initials(p.name)) + "</span>";
     if (p.photo) {
-      return '<div class="' + cls + '"><img src="' + esc(p.photo) + '" alt="' + esc(p.name) + '" loading="lazy"></div>';
+      // if the file is missing the img is swapped for the monogram — see wireImageFallbacks
+      return '<div class="' + cls + '" data-initials="' + esc(initials(p.name)) + '">' +
+             '<img src="' + esc(p.photo) + '" alt="' + esc(p.name) + '" loading="lazy"></div>';
     }
-    return '<div class="' + cls + '"><span class="mono-initials">' + esc(initials(p.name)) + "</span></div>";
+    return '<div class="' + cls + '">' + mono + "</div>";
   }
 
-  function roleLine(p, i) {
-    if (p.role) return { text: p.role, empty: false };
-    return { text: NO_ROLE_LINES[i % NO_ROLE_LINES.length], empty: true };
-  }
-
-  function renderStats() {
-    var total   = state.people.length;
-    var coaches = state.people.filter(function (p) { return p.coach; }).length;
-    var inComm  = state.people.filter(function (p) {
-      return p.status === "in-community" || p.status === "quiet";
-    }).length;
-
-    el.stats.innerHTML =
-      stat(total, total === 1 ? "person" : "people") +
-      stat(coaches, coaches === 1 ? "coach" : "coaches") +
-      stat(inComm, "in the community") +
-      stat(4, "circles");
-
-    function stat(n, label) {
-      return '<div class="stat"><b>' + n + "</b><span>" + esc(label) + "</span></div>";
-    }
-  }
-
-  function renderFilters() {
-    var counts = { all: state.people.length, coach: 0 };
-    Object.keys(CIRCLES).forEach(function (k) { counts[k] = 0; });
-    state.people.forEach(function (p) {
-      counts[p.circle] = (counts[p.circle] || 0) + 1;
-      if (p.coach) counts.coach++;
+  /* A photo path that 404s should fall back to the monogram, not a broken
+     image icon — this is what lets you drop files into photos/ gradually. */
+  function wireImageFallbacks(root) {
+    var imgs = root.querySelectorAll(".avatar img, .sheet-avatar img");
+    Array.prototype.forEach.call(imgs, function (img) {
+      img.addEventListener("error", function () {
+        var box = img.parentNode;
+        box.innerHTML = '<span class="mono-initials">' +
+          esc(box.getAttribute("data-initials") || "?") + "</span>";
+      });
     });
-
-    var defs = [{ key: "all", suit: "", label: "Everyone", cls: "" }];
-    Object.keys(CIRCLES).forEach(function (k) {
-      if (!counts[k]) return;
-      defs.push({ key: k, suit: CIRCLES[k].suit, label: CIRCLES[k].short, cls: "is-" + k });
-    });
-    if (counts.coach) defs.push({ key: "coach", suit: "♛", label: "Coaches", cls: "is-coach" });
-
-    el.filters.innerHTML = defs.map(function (d) {
-      return '<button class="chip ' + d.cls + '" data-filter="' + d.key + '" ' +
-        'aria-pressed="' + (state.filter === d.key) + '">' +
-        (d.suit ? '<span class="chip-suit">' + d.suit + "</span>" : "") +
-        esc(d.label) + ' <span class="chip-count">' + counts[d.key] + "</span></button>";
-    }).join("");
   }
 
   function renderDeck() {
-    var list = visiblePeople();
-
-    if (!list.length) {
-      el.deck.innerHTML =
-        '<div class="empty-state"><span>♠♥♦♣</span>' +
-        "No cards match that. Try another search.</div>";
-      return;
-    }
+    var list = orderedPeople();
 
     el.deck.innerHTML = list.map(function (p, i) {
       var c = CIRCLES[p.circle];
-      var role = roleLine(p, i);
+      var role = p.role ? { text: p.role, empty: false }
+                        : { text: NO_ROLE_LINES[i % NO_ROLE_LINES.length], empty: true };
       return (
-        '<button class="card c-' + p.circle + (p.coach ? " is-coach" : "") + '" ' +
+        '<button class="card t-' + tintOf(p) + (p.coach ? " is-coach" : "") + '" ' +
           'data-id="' + esc(p.id) + '" data-suit="' + c.suit + '" ' +
           'style="animation-delay:' + Math.min(i * 45, 700) + 'ms" ' +
           'aria-label="Open ' + esc(p.name) + '">' +
@@ -250,17 +201,20 @@
         "</button>"
       );
     }).join("");
+
+    wireImageFallbacks(el.deck);
   }
 
   function shortStatus(s) {
-    return { "in-community": "Active", "quiet": "Quieter", "off-platform": "Off-platform", "unknown": "TBC" }[s] || "TBC";
+    return {
+      "in-community": "Active",
+      "quiet": "Quieter",
+      "off-platform": "Off-platform",
+      "unknown": "TBC"
+    }[s] || "TBC";
   }
 
-  function render() {
-    renderStats();
-    renderFilters();
-    renderDeck();
-  }
+  function render() { renderDeck(); }
 
   /* --------------------------------------------------------- person view */
 
@@ -268,7 +222,8 @@
     var p = state.people.filter(function (x) { return x.id === id; })[0];
     if (!p) return;
     var c = CIRCLES[p.circle];
-    var role = p.role ? { text: p.role, empty: false } : { text: "Role not decided yet", empty: true };
+    var role = p.role ? { text: p.role, empty: false }
+                      : { text: "Role not decided yet", empty: true };
 
     var facts = "";
     facts += fact("Circle", c.suit + " " + esc(c.label));
@@ -281,7 +236,7 @@
       : '<span style="color:var(--ink-faint)">Nothing public to share</span>');
 
     el.personContent.innerHTML =
-      '<div class="sheet-head c-' + p.circle + (p.coach ? " is-coach" : "") + '" data-suit="' + c.suit + '">' +
+      '<div class="sheet-head t-' + tintOf(p) + (p.coach ? " is-coach" : "") + '" data-suit="' + c.suit + '">' +
         avatarMarkup(p, "sheet-avatar") +
         '<div class="sheet-id">' +
           '<h2 id="sheetName">' + esc(p.name) + "</h2>" +
@@ -306,6 +261,7 @@
           : "") +
       "</div>";
 
+    wireImageFallbacks(el.personContent);
     show(el.personOverlay);
 
     function fact(label, value) {
@@ -354,6 +310,7 @@
     $("f-role").value       = p ? p.role : "";
     $("f-circle").value     = p ? p.circle : "wildcard";
     $("f-status").value     = p ? p.status : "unknown";
+    $("f-color").value      = p ? p.color : "";
     $("f-coach").checked    = p ? p.coach : false;
     $("f-photo").value      = p ? p.photo : "";
     $("f-email").value      = p ? p.email : "";
@@ -386,6 +343,7 @@
       role:       $("f-role").value.trim(),
       circle:     $("f-circle").value,
       status:     $("f-status").value,
+      color:      $("f-color").value,
       coach:      $("f-coach").checked,
       photo:      $("f-photo").value.trim(),
       email:      $("f-email").value.trim(),
@@ -404,7 +362,6 @@
     } else {
       data.id = uniqueId(slug(data.name), state.people);
       state.people.push(normalise(data));
-      state.order = null;
       toast(data.name + " joined the deck");
     }
     save();
@@ -502,29 +459,6 @@
       if (edit) openEditor(edit.getAttribute("data-edit"));
     });
 
-    el.filters.addEventListener("click", function (e) {
-      var chip = e.target.closest("[data-filter]");
-      if (!chip) return;
-      state.filter = chip.getAttribute("data-filter");
-      render();
-    });
-
-    el.search.addEventListener("input", function () {
-      state.query = el.search.value;
-      renderDeck();
-    });
-
-    $("shuffle").addEventListener("click", function () {
-      var ids = state.people.map(function (p) { return p.id; });
-      for (var i = ids.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var t = ids[i]; ids[i] = ids[j]; ids[j] = t;
-      }
-      state.order = ids;
-      renderDeck();
-      toast("Deck shuffled");
-    });
-
     // overlays
     $("personClose").addEventListener("click", function () { hide(el.personOverlay); });
     $("editorClose").addEventListener("click", function () { hide(el.editorOverlay); });
@@ -578,7 +512,6 @@
       if (!confirm("Throw away local changes and go back to the deck saved in the repository?")) return;
       try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
       state.people = seedPeople();
-      state.order = null;
       render();
       toast("Back to the saved deck");
     });
@@ -586,7 +519,6 @@
     // export helpers
     $("copyExport").addEventListener("click", function () {
       el.exportBox.select();
-      var ok = false;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(el.exportBox.value).then(
           function () { toast("Copied — paste into data/team.js"); },
@@ -594,6 +526,7 @@
         );
         return;
       }
+      var ok = false;
       try { ok = document.execCommand("copy"); } catch (e) {}
       toast(ok ? "Copied — paste into data/team.js" : "Select the text and copy manually");
     });
@@ -619,9 +552,6 @@
 
   function init() {
     el.deck          = $("deck");
-    el.stats         = $("stats");
-    el.filters       = $("filters");
-    el.search        = $("search");
     el.toast         = $("toast");
     el.personOverlay = $("personOverlay");
     el.personContent = $("personContent");

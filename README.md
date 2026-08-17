@@ -66,10 +66,16 @@ grows a ✎ (edit) and ✕ (delete) button:
 
 ### Adding a photo
 
-In the editor, either paste an **image URL**, or hit **Upload** to pick a file from
-your computer. Uploaded photos are embedded directly in the data, so keep them
-under ~900 KB — a 400×400 headshot is plenty. People without a photo get a
-handsome initial monogram instead, so the page never looks broken.
+The simplest way: drop a file into `photos/` named after the person's id —
+`photos/misty.jpg`, `photos/zach.jpg` — and commit it. The cards already point at
+those paths, so the photo just appears. See `photos/README.md`.
+
+You can also paste an **image URL** in the editor, or hit **Upload** to embed a
+file straight into the data (keep those under ~900 KB).
+
+A card whose photo is missing falls back to a monogram rather than a broken
+image, so you can add pictures one at a time without the page ever looking
+unfinished.
 
 ---
 

@@ -14,7 +14,11 @@
              (wildcard = circle not assigned yet)
    coach     true if this person is a team coach (gold card)
    status    "in-community" | "quiet" | "off-platform" | "unknown"
-   photo     image URL or data: URI. Leave "" for a monogram card.
+   color     "blue" | "red" | "yellow" | "green" — the card colour.
+             Leave "" to have one picked automatically.
+   photo     path or URL to the picture. The cards point at photos/<id>.jpg —
+             drop a file with that exact name into the photos/ folder and it
+             appears. Until then the card shows a monogram instead.
    email     "" if there is no contact info to share
    blurb     one or two sentences for the detail view
    superpower  short, playful — shows as a badge in the detail view
@@ -33,7 +37,8 @@ window.LESKO_TEAM_SEED = {
       circle: "steering",
       coach: true,
       status: "in-community",
-      photo: "",
+      color: "",
+      photo: "photos/matthew.jpg",
       email: "",
       blurb:
         "The face and the voice of Lesko Help. Hosts Matthew Live every week and holds the brand — the video library, the tone, the promise we make to members.",
@@ -48,7 +53,8 @@ window.LESKO_TEAM_SEED = {
       circle: "steering",
       coach: false,
       status: "in-community",
-      photo: "",
+      color: "blue",
+      photo: "photos/giulia.jpg",
       email: "",
       blurb:
         "Writes the plan and then makes it real. Org structure, the marketing-to-tech handoff, and the documents that keep everybody pointing the same direction.",
@@ -57,27 +63,14 @@ window.LESKO_TEAM_SEED = {
       since: ""
     },
     {
-      id: "misty",
-      name: "Misty",
+      id: "amber",
+      name: "Amber",
       role: "",
       circle: "wildcard",
       coach: false,
       status: "unknown",
-      photo: "",
-      email: "",
-      blurb: "",
-      superpower: "",
-      funFact: "",
-      since: ""
-    },
-    {
-      id: "martin",
-      name: "Martin",
-      role: "",
-      circle: "wildcard",
-      coach: false,
-      status: "unknown",
-      photo: "",
+      color: "red",
+      photo: "photos/amber.jpg",
       email: "",
       blurb: "",
       superpower: "",
@@ -91,7 +84,8 @@ window.LESKO_TEAM_SEED = {
       circle: "wildcard",
       coach: false,
       status: "unknown",
-      photo: "",
+      color: "yellow",
+      photo: "photos/carter.jpg",
       email: "",
       blurb: "",
       superpower: "",
@@ -99,13 +93,14 @@ window.LESKO_TEAM_SEED = {
       since: ""
     },
     {
-      id: "rose",
-      name: "Rose",
+      id: "martin",
+      name: "Martin",
       role: "",
       circle: "wildcard",
       coach: false,
       status: "unknown",
-      photo: "",
+      color: "green",
+      photo: "photos/martin.jpg",
       email: "",
       blurb: "",
       superpower: "",
@@ -113,13 +108,14 @@ window.LESKO_TEAM_SEED = {
       since: ""
     },
     {
-      id: "tony",
-      name: "Tony",
+      id: "megan",
+      name: "Megan",
       role: "",
       circle: "wildcard",
       coach: false,
       status: "unknown",
-      photo: "",
+      color: "yellow",
+      photo: "photos/megan.jpg",
       email: "",
       blurb: "",
       superpower: "",
@@ -127,13 +123,14 @@ window.LESKO_TEAM_SEED = {
       since: ""
     },
     {
-      id: "amber",
-      name: "Amber",
+      id: "misty",
+      name: "Misty",
       role: "",
       circle: "wildcard",
       coach: false,
       status: "unknown",
-      photo: "",
+      color: "blue",
+      photo: "photos/misty.jpg",
       email: "",
       blurb: "",
       superpower: "",
@@ -147,7 +144,53 @@ window.LESKO_TEAM_SEED = {
       circle: "wildcard",
       coach: false,
       status: "unknown",
-      photo: "",
+      color: "red",
+      photo: "photos/roger.jpg",
+      email: "",
+      blurb: "",
+      superpower: "",
+      funFact: "",
+      since: ""
+    },
+    {
+      id: "rose",
+      name: "Rose",
+      role: "",
+      circle: "wildcard",
+      coach: false,
+      status: "unknown",
+      color: "yellow",
+      photo: "photos/rose.jpg",
+      email: "",
+      blurb: "",
+      superpower: "",
+      funFact: "",
+      since: ""
+    },
+    {
+      id: "tony",
+      name: "Tony",
+      role: "",
+      circle: "wildcard",
+      coach: false,
+      status: "unknown",
+      color: "green",
+      photo: "photos/tony.jpg",
+      email: "",
+      blurb: "",
+      superpower: "",
+      funFact: "",
+      since: ""
+    },
+    {
+      id: "zach",
+      name: "Zach",
+      role: "",
+      circle: "wildcard",
+      coach: false,
+      status: "unknown",
+      color: "red",
+      photo: "photos/zach.jpg",
       email: "",
       blurb: "",
       superpower: "",

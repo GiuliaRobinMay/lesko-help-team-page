@@ -26,66 +26,16 @@
 
   <!-- ------------------------------------------------------------ hero -->
   <section class="hero">
-    <div class="hero-stamp" aria-hidden="true">
-      <div><b>♦</b><span>THE TEAM</span></div>
-    </div>
-
-    <div class="tag-row">
-      <span class="tag-black">The full deck</span>
-      <span class="mono-label">People &middot; Circles &middot; Who&rsquo;s where</span>
-    </div>
-
     <h1>Meet the people<br><em>behind</em> Lesko Help.</h1>
-
     <p class="hero-copy">
       Everyone who makes this thing run, one card each. Pick a card to see what
       they do, which circle they sit in, and how to reach them — where there is
       something to reach. Coaches get the gold treatment.
     </p>
-
-    <div class="stats" id="stats"></div>
   </section>
-
-</div>
-
-<!-- ------------------------------------------------------------- toolbar -->
-<div class="toolbar">
-  <div class="wrap toolbar-inner">
-    <div class="search">
-      <input type="search" id="search" placeholder="Search a name or a role…" aria-label="Search the team">
-    </div>
-    <div class="chips" id="filters" role="group" aria-label="Filter the deck"></div>
-    <button class="btn ghost" id="shuffle" title="Shuffle the deck">↻ Shuffle</button>
-  </div>
-</div>
-
-<div class="wrap">
 
   <!-- ------------------------------------------------------------ deck -->
   <main class="deck" id="deck" aria-live="polite"></main>
-
-  <!-- ---------------------------------------------------------- legend -->
-  <section class="legend">
-    <h3>How to read the deck</h3>
-    <div class="legend-item"><span class="legend-suit" style="color:var(--blue)">&spades;</span>
-      <div><b>Steering</b><p>Direction, money, people, structure.</p></div></div>
-    <div class="legend-item"><span class="legend-suit" style="color:var(--red)">&hearts;</span>
-      <div><b>Membership</b><p>Marketing, support, the member journey.</p></div></div>
-    <div class="legend-item"><span class="legend-suit" style="color:var(--yellow)">&diams;</span>
-      <div><b>Events &amp; Learning</b><p>Live sessions, coaching, curriculum.</p></div></div>
-    <div class="legend-item"><span class="legend-suit" style="color:var(--green)">&clubs;</span>
-      <div><b>Tech, Platform &amp; AI</b><p>Platform, AI tools, automations, data.</p></div></div>
-    <div class="legend-item"><span class="legend-suit">&#9733;</span>
-      <div><b>Wildcards</b><p>Circle not assigned yet — coming in the first circle meetings.</p></div></div>
-    <div class="legend-item"><span class="legend-suit">&#9819;</span>
-      <div><b>Gold cards</b><p>Team coaches.</p></div></div>
-    <div class="legend-item"><span class="dot in-community" style="margin-top:5px"></span>
-      <div><b>Active in the community</b><p>You&rsquo;ll find them posting and answering.</p></div></div>
-    <div class="legend-item"><span class="dot quiet" style="margin-top:5px"></span>
-      <div><b>In the community, quieter</b><p>On the platform, less visible day to day.</p></div></div>
-    <div class="legend-item"><span class="dot off-platform" style="margin-top:5px"></span>
-      <div><b>Not in the community</b><p>Works with us, not on the platform.</p></div></div>
-  </section>
 
   <!-- ---------------------------------------------------------- footer -->
   <footer class="foot">
@@ -144,6 +94,23 @@
         </div>
       </div>
 
+      <div class="field-row">
+        <div class="field">
+          <label class="mono-label" for="f-color">Card colour</label>
+          <select id="f-color" name="color">
+            <option value="">Pick one automatically</option>
+            <option value="blue">Blue ♠</option>
+            <option value="red">Red ♥</option>
+            <option value="yellow">Yellow ♦</option>
+            <option value="green">Green ♣</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="mono-label" for="f-since">With us since</label>
+          <input type="text" id="f-since" name="since" autocomplete="off" placeholder="e.g. 2023">
+        </div>
+      </div>
+
       <div class="field">
         <label class="check">
           <input type="checkbox" id="f-coach" name="coach">
@@ -156,7 +123,7 @@
         <div class="photo-row">
           <div class="photo-preview" id="photoPreview">?</div>
           <div style="flex:1">
-            <input type="text" id="f-photo" name="photo" placeholder="Paste an image URL, or upload →" autocomplete="off">
+            <input type="text" id="f-photo" name="photo" placeholder="photos/name.jpg — or paste a URL" autocomplete="off">
             <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
               <label class="btn ghost" style="display:inline-block">
                 Upload
@@ -184,14 +151,9 @@
           <input type="text" id="f-superpower" name="superpower" autocomplete="off" placeholder="Something playful">
         </div>
         <div class="field">
-          <label class="mono-label" for="f-since">With us since</label>
-          <input type="text" id="f-since" name="since" autocomplete="off" placeholder="e.g. 2023">
+          <label class="mono-label" for="f-funfact">Fun fact</label>
+          <input type="text" id="f-funfact" name="funFact" autocomplete="off">
         </div>
-      </div>
-
-      <div class="field">
-        <label class="mono-label" for="f-funfact">Fun fact</label>
-        <input type="text" id="f-funfact" name="funFact" autocomplete="off">
       </div>
 
       <input type="hidden" id="f-id" name="id">
