@@ -6,8 +6,8 @@
    ================================================================== */
 
 :root {
-  --paper:        #fbf7ec;
-  --paper-2:      #fffdf7;
+  --paper:        #faf6ec;
+  --paper-2:      #fffefa;
   --ink:          #16223f;
   --ink-soft:     #4a5570;
   --ink-faint:    #8a93a8;
@@ -42,19 +42,6 @@ body {
   font-size: 16px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-}
-
-/* soft colour wash, pinned to the viewport so it never seams mid-page */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 12% 6%,  rgba(246,197,68,.20), transparent 45%),
-    radial-gradient(circle at 88% 2%,  rgba(232,69,60,.12),  transparent 40%),
-    radial-gradient(circle at 72% 96%, rgba(46,67,200,.09),  transparent 46%);
 }
 
 .wrap { width: min(1100px, 90vw); margin: 0 auto; }
