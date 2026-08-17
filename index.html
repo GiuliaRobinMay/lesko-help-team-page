@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Lesko Help Team</title>
+<meta name="description" content="Everyone who makes Lesko Help run — one card each.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♥</text></svg>">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ---------------------------------------------------------- topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <!-- Hidden admin trigger #1: click this badge 5 times -->
+      <div class="brand-mark" id="secretMark" title="Lesko Help">?</div>
+      <div class="brand-name"><i>Lesko</i><b>Help</b></div>
+    </div>
+    <div class="suits" aria-hidden="true">
+      <span>&spades;</span><span>&hearts;</span><span>&diams;</span><span>&clubs;</span>
+    </div>
+  </header>
+
+  <!-- ------------------------------------------------------------ hero -->
+  <section class="hero">
+    <div class="hero-stamp" aria-hidden="true">
+      <div><b>♦</b><span>THE TEAM</span></div>
+    </div>
+
+    <div class="tag-row">
+      <span class="tag-black">The full deck</span>
+      <span class="mono-label">People &middot; Circles &middot; Who&rsquo;s where</span>
+    </div>
+
+    <h1>Meet the people<br><em>behind</em> Lesko Help.</h1>
+
+    <p class="hero-copy">
+      Everyone who makes this thing run, one card each. Pick a card to see what
+      they do, which circle they sit in, and how to reach them — where there is
+      something to reach. Coaches get the gold treatment.
+    </p>
+
+    <div class="stats" id="stats"></div>
+  </section>
+
+</div>
+
+<!-- ------------------------------------------------------------- toolbar -->
+<div class="toolbar">
+  <div class="wrap toolbar-inner">
+    <div class="search">
+      <input type="search" id="search" placeholder="Search a name or a role…" aria-label="Search the team">
+    </div>
+    <div class="chips" id="filters" role="group" aria-label="Filter the deck"></div>
+    <button class="btn ghost" id="shuffle" title="Shuffle the deck">↻ Shuffle</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ------------------------------------------------------------ deck -->
+  <main class="deck" id="deck" aria-live="polite"></main>
+
+  <!-- ---------------------------------------------------------- legend -->
+  <section class="legend">
+    <h3>How to read the deck</h3>
+    <div class="legend-item"><span class="legend-suit" style="color:var(--blue)">&spades;</span>
+      <div><b>Steering</b><p>Direction, money, people, structure.</p></div></div>
+    <div class="legend-item"><span class="legend-suit" style="color:var(--red)">&hearts;</span>
+      <div><b>Membership</b><p>Marketing, support, the member journey.</p></div></div>
+    <div class="legend-item"><span class="legend-suit" style="color:var(--yellow)">&diams;</span>
+      <div><b>Events &amp; Learning</b><p>Live sessions, coaching, curriculum.</p></div></div>
+    <div class="legend-item"><span class="legend-suit" style="color:var(--green)">&clubs;</span>
+      <div><b>Tech, Platform &amp; AI</b><p>Platform, AI tools, automations, data.</p></div></div>
+    <div class="legend-item"><span class="legend-suit">&#9733;</span>
+      <div><b>Wildcards</b><p>Circle not assigned yet — coming in the first circle meetings.</p></div></div>
+    <div class="legend-item"><span class="legend-suit">&#9819;</span>
+      <div><b>Gold cards</b><p>Team coaches.</p></div></div>
+    <div class="legend-item"><span class="dot in-community" style="margin-top:5px"></span>
+      <div><b>Active in the community</b><p>You&rsquo;ll find them posting and answering.</p></div></div>
+    <div class="legend-item"><span class="dot quiet" style="margin-top:5px"></span>
+      <div><b>In the community, quieter</b><p>On the platform, less visible day to day.</p></div></div>
+    <div class="legend-item"><span class="dot off-platform" style="margin-top:5px"></span>
+      <div><b>Not in the community</b><p>Works with us, not on the platform.</p></div></div>
+  </section>
+
+  <!-- ---------------------------------------------------------- footer -->
+  <footer class="foot">
+    <div class="mono-label">Lesko Help &middot; the team &middot; a living page</div>
+    <!-- Hidden admin trigger #2 -->
+    <div class="foot-suit" id="secretFoot" title="?">?</div>
+  </footer>
+
+</div>
+
+<!-- --------------------------------------------------------- person sheet -->
+<div class="overlay" id="personOverlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetName">
+    <button class="sheet-close" id="personClose" aria-label="Close">✕</button>
+    <div id="personContent"></div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------- editor -->
+<div class="overlay" id="editorOverlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+    <button class="sheet-close" id="editorClose" aria-label="Close">✕</button>
+    <form class="editor" id="editorForm">
+      <h2 id="editorTitle">Add a card</h2>
+      <p class="hint">Everything except the name is optional. You can always come back.</p>
+
+      <div class="field">
+        <label class="mono-label" for="f-name">Name *</label>
+        <input type="text" id="f-name" name="name" required autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label class="mono-label" for="f-role">Role — leave empty if undecided</label>
+        <input type="text" id="f-role" name="role" autocomplete="off" placeholder="e.g. Grant Coach">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="mono-label" for="f-circle">Circle</label>
+          <select id="f-circle" name="circle">
+            <option value="wildcard">★ Wildcard — not assigned yet</option>
+            <option value="steering">♠ Steering</option>
+            <option value="membership">♥ Membership</option>
+            <option value="events">♦ Events &amp; Learning</option>
+            <option value="tech">♣ Tech, Platform &amp; AI</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="mono-label" for="f-status">In the community?</label>
+          <select id="f-status" name="status">
+            <option value="unknown">Not confirmed yet</option>
+            <option value="in-community">Yes — active</option>
+            <option value="quiet">Yes — but quieter</option>
+            <option value="off-platform">No — not on the platform</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="check">
+          <input type="checkbox" id="f-coach" name="coach">
+          <span>Team coach &mdash; gives this card the gold look ♛</span>
+        </label>
+      </div>
+
+      <div class="field">
+        <label class="mono-label" for="f-photo">Photo</label>
+        <div class="photo-row">
+          <div class="photo-preview" id="photoPreview">?</div>
+          <div style="flex:1">
+            <input type="text" id="f-photo" name="photo" placeholder="Paste an image URL, or upload →" autocomplete="off">
+            <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
+              <label class="btn ghost" style="display:inline-block">
+                Upload
+                <input type="file" id="f-upload" accept="image/*" hidden>
+              </label>
+              <button type="button" class="btn ghost" id="clearPhoto">Clear photo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="mono-label" for="f-email">Contact — leave empty if there is none to share</label>
+        <input type="text" id="f-email" name="email" autocomplete="off" placeholder="email or link">
+      </div>
+
+      <div class="field">
+        <label class="mono-label" for="f-blurb">Short intro</label>
+        <textarea id="f-blurb" name="blurb" placeholder="A sentence or two about what they do."></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="mono-label" for="f-superpower">Superpower</label>
+          <input type="text" id="f-superpower" name="superpower" autocomplete="off" placeholder="Something playful">
+        </div>
+        <div class="field">
+          <label class="mono-label" for="f-since">With us since</label>
+          <input type="text" id="f-since" name="since" autocomplete="off" placeholder="e.g. 2023">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="mono-label" for="f-funfact">Fun fact</label>
+        <input type="text" id="f-funfact" name="funFact" autocomplete="off">
+      </div>
+
+      <input type="hidden" id="f-id" name="id">
+
+      <div class="editor-actions">
+        <button type="submit" class="btn">Save card</button>
+        <button type="button" class="btn ghost" id="editorCancel">Cancel</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn danger" id="editorDelete" hidden>Delete card</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------- export -->
+<div class="overlay" id="exportOverlay" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <button class="sheet-close" id="exportClose" aria-label="Close">✕</button>
+    <div class="editor">
+      <h2 id="exportTitle">Save the deck for everyone</h2>
+      <p class="hint">
+        Your edits live in this browser only. To make them the real thing for every
+        visitor, copy everything below and paste it over the contents of
+        <code>data/team.js</code> in the repository, then commit.
+      </p>
+      <textarea class="export-box" id="exportBox" readonly spellcheck="false"></textarea>
+      <div class="editor-actions">
+        <button type="button" class="btn" id="copyExport">Copy to clipboard</button>
+        <button type="button" class="btn ghost" id="downloadExport">Download team.js</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<!-- --------------------------------------------------------- admin bar -->
+<div class="admin-bar">
+  <div class="wrap">
+    <span class="mono-label">Admin mode</span>
+    <button class="btn" id="addPerson">+ Add person</button>
+    <button class="btn ghost" id="exportBtn">Export deck</button>
+    <button class="btn ghost" id="resetBtn">Reset to saved file</button>
+    <span class="spacer"></span>
+    <button class="btn ink" id="exitAdmin">Exit admin</button>
+  </div>
+</div>
+
+<script src="data/team.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
