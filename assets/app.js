@@ -139,42 +139,65 @@
 
   /* -------------------------------------------------------------- render */
 
+  /* Every place a photo might live, best first. The card walks this list and
+     shows the first one that loads:
+       1. a file committed to photos/ (once there is one, it wins)
+       2. the Google Drive link, in both of the forms Drive serves images on
+       3. the monogram
+     That way photos work straight from Drive today, and switch over to the
+     committed files automatically the moment those exist. */
+  function photoCandidates(p) {
+    var out = [];
+    var drive = /[?&]id=([\w-]+)/.exec(p.photo || "");
+
+    if (drive) {
+      var id = drive[1];
+      ["jpg", "jpeg", "png", "webp"].forEach(function (ext) {
+        out.push("photos/" + p.id + "." + ext);
+      });
+      out.push("https://drive.google.com/thumbnail?id=" + id + "&sz=w1000");
+      out.push("https://lh3.googleusercontent.com/d/" + id + "=w1000");
+      out.push("https://drive.google.com/uc?export=view&id=" + id);
+    } else if (p.photo) {
+      out.push(p.photo);
+      var m = /^(.*\/[^/]+)\.([A-Za-z]+)$/.exec(p.photo);
+      if (m) {
+        ["jpg", "jpeg", "png", "webp"].forEach(function (ext) {
+          if (ext !== m[2].toLowerCase()) out.push(m[1] + "." + ext);
+        });
+      }
+    }
+    return out;
+  }
+
   function avatarMarkup(p, cls) {
-    if (p.photo) {
-      // a missing file is swapped for the monogram — see wireImageFallbacks
-      return '<div class="' + cls + '" data-initials="' + esc(initials(p.name)) + '">' +
-             '<img src="' + esc(p.photo) + '" alt="' + esc(p.name) + '" loading="lazy"></div>';
+    var cands = photoCandidates(p);
+    if (cands.length) {
+      return '<div class="' + cls + '" data-initials="' + esc(initials(p.name)) + '" ' +
+             "data-cands='" + esc(JSON.stringify(cands)) + "'>" +
+             '<img src="' + esc(cands[0]) + '" alt="' + esc(p.name) +
+             '" referrerpolicy="no-referrer" loading="lazy"></div>';
     }
     return '<div class="' + cls + '"><span class="mono-initials">' +
            esc(initials(p.name)) + "</span></div>";
   }
 
-  var PHOTO_EXTS = ["jpg", "jpeg", "png", "webp", "JPG", "JPEG", "PNG"];
-
-  /* A photo that fails to load first tries the other common extensions, so a
-     file saved as .png still shows up on a card pointing at .jpg. Only once
-     every extension has failed does the card fall back to the monogram —
-     never a broken-image icon. This is what lets photos be dropped into
-     photos/ one at a time, whatever the camera called them. */
+  /* Walk the candidate list on each failure; show the monogram only once every
+     candidate has missed — never a broken-image icon. */
   function wireImageFallbacks(root) {
     var imgs = root.querySelectorAll(".avatar img, .sheet-avatar img");
     Array.prototype.forEach.call(imgs, function (img) {
       img.addEventListener("error", function () {
         var box = img.parentNode;
-        var m = /^(.*\/[^/]+)\.([A-Za-z]+)$/.exec(img.getAttribute("src") || "");
+        var cands;
+        try { cands = JSON.parse(box.getAttribute("data-cands") || "[]"); }
+        catch (e) { cands = []; }
 
-        if (m) {
-          var tried = (box.getAttribute("data-tried") || "").split(",");
-          if (tried[0] === "") tried = [];
-          tried.push(m[2]);
-          box.setAttribute("data-tried", tried.join(","));
-
-          for (var i = 0; i < PHOTO_EXTS.length; i++) {
-            if (tried.indexOf(PHOTO_EXTS[i]) === -1) {
-              img.setAttribute("src", m[1] + "." + PHOTO_EXTS[i]);
-              return;
-            }
-          }
+        var next = (parseInt(box.getAttribute("data-at") || "0", 10) || 0) + 1;
+        if (next < cands.length) {
+          box.setAttribute("data-at", next);
+          img.setAttribute("src", cands[next]);
+          return;
         }
 
         box.innerHTML = '<span class="mono-initials">' +
