@@ -19,18 +19,16 @@ data/team.js        THE TEAM — this is the file you edit or export into
 ## What's on the page
 
 * **A card per person**, drawn with a hairline and a colour of its own. Click any
-  card to open their detail sheet — role, circle, whether they're in the community,
-  contact (only when there is one to share), superpower, fun fact.
-* **Coaches get gold cards** with a `COACH` ribbon and a gold detail sheet, so
-  they stand out from everyone else at a glance.
-* **Four card colours** — blue, red, yellow, green. Set one per person in the
-  admin panel, or leave it on automatic and the page picks a stable colour.
-* **Circles are the four suits** from the org document:
-  ♠ Steering · ♥ Membership · ♦ Events & Learning · ♣ Tech, Platform & AI.
-  Anyone whose circle isn't decided yet is a **★ Wildcard** — an honest placeholder
-  rather than a wrong answer.
-* **Community status** is a coloured dot: active · quieter · not on the platform ·
-  to be confirmed. Not everyone is in the community, and the page says so plainly.
+  card to open their detail sheet — title, section, whether they're in the
+  community, contact (only when there is one to share), superpower, fun fact.
+* **Two sections**: *The coaching team* and *Behind the scenes*. The order on the
+  page is simply the order of the list in `data/team.js`.
+* **Coaches get gold cards** with a `COACH` ribbon, so they read differently at a
+  glance. Matthew gets a deep red host card of his own.
+* **Card colours** — blue, red, yellow, green, plus the deep red host card. Set one
+  per person in admin, or leave it automatic and the page picks a stable colour.
+* **In the community** is one short line with a green dot. A card says nothing at
+  all until you've confirmed it, rather than guessing.
 * Works on phones, keyboard-navigable, and respects reduced-motion settings.
 
 ---
@@ -59,7 +57,8 @@ grows a ✎ (edit) and ✕ (delete) button:
 | Button | What it does |
 | --- | --- |
 | **+ Add person** | Opens a blank card. Only the name is required. |
-| **✎ on a card** | Edit that person — role, circle, coach toggle, status, photo, contact, intro. |
+| **✎ on a card** | Edit that person — title, section, coach toggle, colour, community, photo, contact, intro. |
+| **↑ ↓ on a card** | Move them earlier or later within their section. |
 | **✕ on a card** | Delete that person (with a confirmation). |
 | **Export deck** | Gives you the new `data/team.js` to save for everyone — see below. |
 | **Reset to saved file** | Throws away your local edits and reloads `data/team.js`. |
@@ -156,14 +155,13 @@ live at `https://<owner>.github.io/lesko-help-team-page/`.
 
 ## Still to fill in
 
-The page ships with the eleven people named so far. Nine of them are Wildcards with
-no role written yet — those are placeholders waiting for real information, not
-guesses:
+The page ships with the eleven people named so far, with their titles and sections
+set. What's still open:
 
-* who else belongs on the page (the rest of the names)
-* which circle each person sits in
-* who the coaches are (only Matthew is flagged today)
-* who is actually active in the community, and who isn't
-* photos, intros, and contact details where there are any to share
+* whether **Christy** is a separate person or the same as Misty — she was named
+  once and I read it as a duplicate, so there is no Christy card today
+* who is actually in the community — only Matthew and Giulia are marked
+* photos (drop them into `photos/`)
+* intros, superpowers and contact details where there are any to share
 
 All of it is editable from the admin panel — no code needed.
