@@ -10,7 +10,7 @@
 
   /* ---------------------------------------------------------- constants */
 
-  var STORAGE_KEY = "leskoTeamDeck.v3";
+  var STORAGE_KEY = "leskoTeamDeck.v4";
   var ADMIN_KEY   = "leskoTeamDeck.admin";
   var PASSCODE    = "lesko";          // change me — see README
   var SECRET_TAPS = 5;                // taps on the "?" badge to unlock
@@ -93,7 +93,6 @@
       inCommunity: inC === true ? true : (inC === false ? false : null),
       color:       TINTS.indexOf(p.color) !== -1 ? p.color : "",
       photo:       p.photo || "",
-      email:       p.email || "",
       blurb:       p.blurb || "",
       superpower:  p.superpower || "",
       funFact:     p.funFact || "",
@@ -121,7 +120,7 @@
 
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 3, people: state.people }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 4, people: state.people }));
     } catch (e) {
       toast("Could not save locally");
     }
@@ -275,13 +274,11 @@
       : { text: "Title not decided yet", empty: true };
     var inC = communityOf(p);
 
+    /* No contact details, by design — the page has no field for them. */
     var facts = "";
     if (p.superpower) facts += fact("Superpower", esc(p.superpower));
     if (p.since)      facts += fact("With us since", esc(p.since));
     if (p.funFact)    facts += fact("Fun fact", esc(p.funFact));
-    facts += fact("Contact", p.email
-      ? '<a href="' + contactHref(p.email) + '">' + esc(p.email) + "</a>"
-      : '<span style="color:var(--ink-faint)">Nothing public to share</span>');
 
     el.personContent.innerHTML =
       '<div class="sheet-head t-' + tintOf(p) + '" data-suit="' + suitOf(p) + '">' +
@@ -298,7 +295,7 @@
       '<div class="sheet-body">' +
         '<p class="blurb' + (p.blurb ? "" : " empty") + '">' +
           esc(p.blurb || "No intro written yet — this card is waiting for its story.") + "</p>" +
-        '<div class="facts">' + facts + "</div>" +
+        (facts ? '<div class="facts">' + facts + "</div>" : "") +
         (isAdmin()
           ? '<div class="editor-actions"><button class="btn" data-edit="' + esc(p.id) + '">Edit this card</button></div>'
           : "") +
@@ -310,13 +307,6 @@
     function fact(label, value) {
       return '<div class="fact"><span class="mono-label">' + esc(label) + "</span><p>" + value + "</p></div>";
     }
-  }
-
-  function contactHref(v) {
-    var s = String(v).trim();
-    if (/^https?:\/\//i.test(s)) return esc(s);
-    if (s.indexOf("@") !== -1) return "mailto:" + esc(s);
-    return esc(s);
   }
 
   /* -------------------------------------------------------------- modals */
@@ -355,7 +345,6 @@
                                 : p.inCommunity === false ? "no" : "") : "";
     $("f-color").value      = p ? p.color : "";
     $("f-photo").value      = p ? p.photo : "";
-    $("f-email").value      = p ? p.email : "";
     $("f-blurb").value      = p ? p.blurb : "";
     $("f-superpower").value = p ? p.superpower : "";
     $("f-since").value      = p ? p.since : "";
@@ -387,7 +376,6 @@
       inCommunity: comm === "yes" ? true : (comm === "no" ? false : null),
       color:       $("f-color").value,
       photo:       $("f-photo").value.trim(),
-      email:       $("f-email").value.trim(),
       blurb:       $("f-blurb").value.trim(),
       superpower:  $("f-superpower").value.trim(),
       since:       $("f-since").value.trim(),
@@ -440,7 +428,7 @@
   /* -------------------------------------------------------------- export */
 
   function exportSource() {
-    var body = JSON.stringify({ version: 3, updated: today(), people: state.people }, null, 2);
+    var body = JSON.stringify({ version: 4, updated: today(), people: state.people }, null, 2);
     return "/* Lesko Help — the team deck. Exported from the admin panel. */\n\n" +
            "window.LESKO_TEAM_SEED = " + body + ";\n";
   }
