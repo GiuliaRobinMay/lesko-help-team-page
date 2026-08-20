@@ -124,6 +124,19 @@ window.LESKO_TEAM_SEED = {
       since: ""
     },
     {
+      id: "mary",
+      name: "Mary",
+      title: "",
+      inCommunity: null,
+      color: "green",
+      photo: "photos/mary.jpg",
+      email: "",
+      blurb: "",
+      superpower: "",
+      funFact: "",
+      since: ""
+    },
+    {
       id: "giulia",
       name: "Giulia",
       title: "Community Admin & Strategist",
